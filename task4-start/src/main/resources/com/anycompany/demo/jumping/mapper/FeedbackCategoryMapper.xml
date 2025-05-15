@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.anycompany.demo.jumping.mapper.FeedbackCategoryMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.anycompany.demo.jumping.model.FeedbackCategory">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- 公共列 -->
+    <sql id="Base_Column_List">
+        id, name, sort_order, status, create_time, update_time
+    </sql>
+    
+    <!-- 根据ID查询反馈类别表 -->
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_feedback_category
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 根据类别名称查询反馈类别表 -->
+    <select id="getByName" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_feedback_category
+        WHERE name = #{name}
+        LIMIT 1
+    </select>
+    
+    <!-- 根据状态(0:禁用 1:启用)查询反馈类别表列表 -->
+    <select id="findByStatus" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_feedback_category
+        WHERE status = #{status}
+    </select>
+    
+    <!-- 查询所有反馈类别表 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_feedback_category
+        ORDER BY sort_order ASC
+    </select>
+    
+    <!-- 查询所有启用的反馈类别表 -->
+    <select id="findAllEnabled" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_feedback_category
+        WHERE status = 1
+        ORDER BY sort_order ASC
+    </select>
+    
+    <!-- 条件查询反馈类别表列表 -->
+    <select id="findList" parameterType="com.anycompany.demo.jumping.model.FeedbackCategory" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_feedback_category
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="sortOrder != null">
+                AND sort_order = #{sortOrder}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY sort_order ASC
+    </select>
+    
+    <!-- 分页查询反馈类别表列表 -->
+    <select id="findListWithPagination" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_feedback_category
+        <where>
+            <if test="feedbackCategory.name != null and feedbackCategory.name != ''">
+                AND name LIKE CONCAT('%', #{feedbackCategory.name}, '%')
+            </if>
+            <if test="feedbackCategory.sortOrder != null">
+                AND sort_order = #{feedbackCategory.sortOrder}
+            </if>
+            <if test="feedbackCategory.status != null">
+                AND status = #{feedbackCategory.status}
+            </if>
+        </where>
+        ORDER BY sort_order ASC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 插入反馈类别表 -->
+    <insert id="insert" parameterType="com.anycompany.demo.jumping.model.FeedbackCategory" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO demo_feedback_category (
+            name, sort_order, status, create_time, update_time
+        ) VALUES (
+            #{name}, #{sortOrder}, #{status}, NOW(), NOW()
+        )
+    </insert>
+    
+    <!-- 更新反馈类别表 -->
+    <update id="update" parameterType="com.anycompany.demo.jumping.model.FeedbackCategory">
+        UPDATE demo_feedback_category
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 更新反馈类别表状态 -->
+    <update id="updateStatus">
+        UPDATE demo_feedback_category
+        SET status = #{status}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除反馈类别表 -->
+    <delete id="deleteById">
+        DELETE FROM demo_feedback_category
+        WHERE id = #{id}
+    </delete>
+    
+    <!-- 批量删除反馈类别表 -->
+    <delete id="batchDelete">
+        DELETE FROM demo_feedback_category
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

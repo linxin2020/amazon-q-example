@@ -1,0 +1,333 @@
+package com.anycompany.demo.jumping.mapper;
+
+import com.anycompany.demo.jumping.model.${className};
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Date;
+import java.math.BigDecimal;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * ${className}Mapper 测试类
+ */
+@SpringBootTest
+@Transactional
+public class ${className}MapperTest {
+
+    @Autowired
+    private ${className}Mapper ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper;
+    
+    /**
+     * 测试插入${tableComment}
+     */
+    @Test
+    public void testInsert() {
+        // 创建测试数据
+        ${className} ${entityVar} = createTest${className}("测试插入");
+        
+        // 执行插入
+        int rows = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar});
+        
+        // 验证结果
+        assertEquals(1, rows);
+        assertNotNull(${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}());
+        
+        // 验证能否查询到
+        ${className} saved${className} = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.getById(${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}());
+        assertNotNull(saved${className});
+        
+        System.out.println("插入${tableComment}成功: " + saved${className});
+    }
+    
+    /**
+     * 测试根据ID查询
+     */
+    @Test
+    public void testGetById() {
+        // 创建测试数据
+        ${className} ${entityVar} = createTest${className}("测试ID查询");
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar});
+        
+        // 执行查询
+        ${className} result = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.getById(${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}());
+        
+        // 验证结果
+        assertNotNull(result);
+        assertEquals(${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}(), result.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}());
+        
+        System.out.println("根据ID查询${tableComment}: " + result);
+    }
+    
+#foreach($column in $columns)
+#if($column.needGetBy)
+    /**
+     * 测试根据${column.columnComment}查询
+     */
+    @Test
+    public void testGetBy${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}() {
+        // 创建测试数据
+        ${className} ${entityVar} = createTest${className}("测试${column.columnComment}查询");
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar});
+        
+        // 执行查询
+        ${className} result = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.getBy${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(${entityVar}.get${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}());
+        
+        // 验证结果
+        assertNotNull(result);
+        assertEquals(${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}(), result.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}());
+        assertEquals(${entityVar}.get${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(), result.get${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}());
+        
+        System.out.println("根据${column.columnComment}查询${tableComment}: " + result);
+    }
+    
+#end
+#end
+#foreach($column in $columns)
+#if($column.needFindBy)
+    /**
+     * 测试根据${column.columnComment}查询列表
+     */
+    @Test
+    public void testFindBy${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}() {
+        // 创建测试数据
+        ${className} ${entityVar}1 = createTest${className}("测试${column.columnComment}查询1");
+        ${className} ${entityVar}2 = createTest${className}("测试${column.columnComment}查询2");
+        // 设置相同的${column.columnComment}，确保能查到多条记录
+        ${entityVar}1.set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(${entityVar}2.get${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}());
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar}1);
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar}2);
+        
+        // 执行查询
+        List<${className}> results = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.findBy${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(${entityVar}1.get${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}());
+        
+        // 验证结果
+        assertNotNull(results);
+        assertTrue(results.size() >= 2);
+        
+        // 验证包含测试数据
+        boolean contains${className}1 = results.stream().anyMatch(c -> c.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}().equals(${entityVar}1.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        boolean contains${className}2 = results.stream().anyMatch(c -> c.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}().equals(${entityVar}2.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        assertTrue(contains${className}1, "结果中不包含${tableComment}1");
+        assertTrue(contains${className}2, "结果中不包含${tableComment}2");
+        
+        System.out.println("根据${column.columnComment}查询${tableComment}列表: " + results.size() + "条记录");
+    }
+    
+#end
+#end
+    /**
+     * 测试查询所有${tableComment}
+     */
+    @Test
+    public void testFindAll() {
+        // 创建测试数据
+        ${className} ${entityVar}1 = createTest${className}("测试查询所有1");
+        ${className} ${entityVar}2 = createTest${className}("测试查询所有2");
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar}1);
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar}2);
+        
+        // 执行查询
+        List<${className}> ${entityVar}List = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.findAll();
+        
+        // 验证结果
+        assertNotNull(${entityVar}List);
+        assertFalse(${entityVar}List.isEmpty());
+        
+        // 验证包含测试数据
+        boolean contains${className}1 = ${entityVar}List.stream().anyMatch(c -> c.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}().equals(${entityVar}1.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        boolean contains${className}2 = ${entityVar}List.stream().anyMatch(c -> c.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}().equals(${entityVar}2.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        assertTrue(contains${className}1, "结果中不包含${tableComment}1");
+        assertTrue(contains${className}2, "结果中不包含${tableComment}2");
+        
+        System.out.println("查询所有${tableComment}数量: " + ${entityVar}List.size());
+    }
+    
+#foreach($column in $columns)
+#if($column.columnName == "status")
+    /**
+     * 测试查询所有启用的${tableComment}
+     */
+    @Test
+    public void testFindAllEnabled() {
+        // 创建启用的测试数据
+        ${className} enabled${className} = createTest${className}("测试启用${tableComment}");
+        enabled${className}.setStatus(1);
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(enabled${className});
+        
+        // 创建禁用的测试数据
+        ${className} disabled${className} = createTest${className}("测试禁用${tableComment}");
+        disabled${className}.setStatus(0);
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(disabled${className});
+        
+        // 执行查询
+        List<${className}> ${entityVar}List = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.findAllEnabled();
+        
+        // 验证结果
+        assertNotNull(${entityVar}List);
+        assertFalse(${entityVar}List.isEmpty());
+        
+        // 验证所有结果都是启用状态且包含启用测试数据
+        boolean containsEnabled${className} = false;
+        for (${className} ${entityVar} : ${entityVar}List) {
+            assertEquals(1, ${entityVar}.getStatus(), "查询到非启用状态的${tableComment}");
+            if (${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}().equals(enabled${className}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}())) {
+                containsEnabled${className} = true;
+            }
+        }
+        assertTrue(containsEnabled${className}, "结果中不包含测试创建的启用${tableComment}");
+        
+        // 验证不包含禁用的测试数据
+        boolean containsDisabled${className} = ${entityVar}List.stream()
+                .anyMatch(c -> c.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}().equals(disabled${className}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        assertFalse(containsDisabled${className}, "结果中不应包含禁用${tableComment}");
+        
+        System.out.println("查询所有启用${tableComment}数量: " + ${entityVar}List.size());
+    }
+#end
+#end
+    
+    /**
+     * 测试条件查询
+     */
+    @Test
+    public void testFindList() {
+        // 创建测试数据
+        ${className} ${entityVar} = createTest${className}("测试条件查询");
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar});
+        
+        // 创建查询条件
+        ${className} query = new ${className}();
+        // 设置查询条件，这里根据实际情况设置
+        
+        // 执行查询
+        List<${className}> ${entityVar}List = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.findList(query);
+        
+        // 验证结果
+        assertNotNull(${entityVar}List);
+        
+        System.out.println("条件查询结果数量: " + ${entityVar}List.size());
+    }
+    
+    /**
+     * 测试更新${tableComment}
+     */
+    @Test
+    public void testUpdate() {
+        // 创建测试数据
+        ${className} ${entityVar} = createTest${className}("测试更新");
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar});
+        
+        // 修改数据
+        // 这里根据实际情况修改字段值
+        
+        // 执行更新
+        int rows = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.update(${entityVar});
+        
+        // 验证结果
+        assertEquals(1, rows);
+        
+        // 验证更新是否生效
+        ${className} updated${className} = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.getById(${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}());
+        assertNotNull(updated${className});
+        
+        System.out.println("更新${tableComment}成功: " + updated${className});
+    }
+    
+    /**
+     * 测试删除${tableComment}
+     */
+    @Test
+    public void testDeleteById() {
+        // 创建测试数据
+        ${className} ${entityVar} = createTest${className}("测试删除");
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar});
+        
+        // 验证创建成功
+        assertNotNull(${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.getById(${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        
+        // 执行删除
+        int rows = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.deleteById(${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}());
+        
+        // 验证结果
+        assertEquals(1, rows);
+        
+        // 验证是否已删除
+        assertNull(${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.getById(${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        
+        System.out.println("删除${tableComment}成功, ID: " + ${entityVar}.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}());
+    }
+    
+    /**
+     * 测试批量删除
+     */
+    @Test
+    public void testBatchDelete() {
+        // 创建测试数据
+        ${className} ${entityVar}1 = createTest${className}("测试批量删除1");
+        ${className} ${entityVar}2 = createTest${className}("测试批量删除2");
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar}1);
+        ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.insert(${entityVar}2);
+        
+        // 验证创建成功
+        assertNotNull(${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.getById(${entityVar}1.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        assertNotNull(${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.getById(${entityVar}2.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        
+        // 执行批量删除
+        ${primaryKey.javaType}[] ids = new ${primaryKey.javaType}[] { ${entityVar}1.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}(), ${entityVar}2.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}() };
+        int rows = ${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.batchDelete(ids);
+        
+        // 验证结果
+        assertEquals(2, rows);
+        
+        // 验证是否已删除
+        assertNull(${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.getById(${entityVar}1.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        assertNull(${className.substring(0,1).toLowerCase()}${className.substring(1)}Mapper.getById(${entityVar}2.get${primaryKey.propertyName.substring(0,1).toUpperCase()}${primaryKey.propertyName.substring(1)}()));
+        
+        System.out.println("批量删除${tableComment}成功, 数量: " + ids.length);
+    }
+    
+    /**
+     * 创建测试用${tableComment}（不保存到数据库）
+     */
+    private ${className} createTest${className}(String testName) {
+        ${className} ${entityVar} = new ${className}();
+        // 设置测试数据，使用随机值确保唯一性
+        long timestamp = System.currentTimeMillis();
+        String randomSuffix = "_" + timestamp + "_" + (int)(Math.random() * 10000);
+        
+#foreach($column in $columns)
+#if($column.propertyName != $primaryKey.propertyName && $column.propertyName != "createTime" && $column.propertyName != "updateTime")
+#if($column.javaType == "String")
+#if($column.isUnique)
+        // 唯一索引字段，确保值唯一
+        ${entityVar}.set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(testName + "_${column.propertyName}" + randomSuffix);
+#else
+        ${entityVar}.set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(testName + "_${column.propertyName}");
+#end
+#elseif($column.javaType == "Integer")
+#if($column.columnName == "status")
+        ${entityVar}.set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(1); // 默认启用状态
+#else
+        ${entityVar}.set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}((int)(Math.random() * 100) + 1);
+#end
+#elseif($column.javaType == "Long")
+        ${entityVar}.set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(timestamp + (long)(Math.random() * 1000));
+#elseif($column.javaType == "Date")
+        ${entityVar}.set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(new Date(System.currentTimeMillis() + (long)(Math.random() * 86400000))); // 随机一天内的时间
+#elseif($column.javaType == "BigDecimal")
+        ${entityVar}.set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(new BigDecimal(String.format("%.2f", Math.random() * 100)));
+#elseif($column.javaType == "Boolean")
+        ${entityVar}.set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(Math.random() > 0.5);
+#elseif($column.javaType == "Double" || $column.javaType == "Float")
+        ${entityVar}.set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(Math.random() * 100);
+#end
+#end
+#end
+        return ${entityVar};
+    }
+}

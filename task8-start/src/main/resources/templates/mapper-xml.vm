@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.${mapperName}">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="${modelPackageName}.${className}">
+#foreach($column in $columns)
+#if($column.isPrimaryKey)
+        <id column="${column.columnName}" property="${column.propertyName}" />
+#else
+        <result column="${column.columnName}" property="${column.propertyName}" />
+#end
+#end
+    </resultMap>
+    
+    <!-- 公共列 -->
+    <sql id="Base_Column_List">
+#set($columnList = "")
+#foreach($column in $columns)
+#if($foreach.hasNext)
+#set($columnList = $columnList + $column.columnName + ", ")
+#else
+#set($columnList = $columnList + $column.columnName)
+#end
+#end
+        ${columnList}
+    </sql>
+    
+    <!-- 根据ID查询${tableComment} -->
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+        WHERE ${primaryKey.columnName} = #{id}
+    </select>
+    
+#foreach($column in $columns)
+#if($column.needGetBy)
+    <!-- 根据${column.columnComment}查询${tableComment} -->
+    <select id="getBy${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+        WHERE ${column.columnName} = #{${column.propertyName}}
+        LIMIT 1
+    </select>
+    
+#end
+#end
+#foreach($column in $columns)
+#if($column.needFindBy)
+    <!-- 根据${column.columnComment}查询${tableComment}列表 -->
+    <select id="findBy${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+        WHERE ${column.columnName} = #{${column.propertyName}}
+    </select>
+    
+#end
+#end
+    <!-- 查询所有${tableComment} -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+#set($hasOrderField = false)
+#foreach($column in $columns)
+#if($column.columnName == "sort_order")
+#set($hasOrderField = true)
+        ORDER BY sort_order ASC
+#break
+#end
+#end
+#if(!$hasOrderField)
+        ORDER BY ${primaryKey.columnName} ASC
+#end
+    </select>
+    
+#foreach($column in $columns)
+#if($column.columnName == "status")
+    <!-- 查询所有启用的${tableComment} -->
+    <select id="findAllEnabled" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+        WHERE status = 1
+#foreach($col in $columns)
+#if($col.columnName == "sort_order")
+        ORDER BY sort_order ASC
+#break
+#end
+#end
+#if(!$hasOrderField)
+        ORDER BY ${primaryKey.columnName} ASC
+#end
+    </select>
+    
+#break
+#end
+#end
+    <!-- 条件查询${tableComment}列表 -->
+    <select id="findList" parameterType="${modelPackageName}.${className}" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+        <where>
+#foreach($column in $columns)
+#if($column.javaType == "String")
+            <if test="${column.propertyName} != null and ${column.propertyName} != ''">
+                AND ${column.columnName} LIKE CONCAT('%', #{${column.propertyName}}, '%')
+            </if>
+#elseif(!$column.isPrimaryKey && $column.columnName != "create_time" && $column.columnName != "update_time")
+            <if test="${column.propertyName} != null">
+                AND ${column.columnName} = #{${column.propertyName}}
+            </if>
+#end
+#end
+        </where>
+#set($hasOrderField = false)
+#foreach($column in $columns)
+#if($column.columnName == "sort_order")
+#set($hasOrderField = true)
+        ORDER BY sort_order ASC
+#break
+#end
+#end
+#if(!$hasOrderField)
+        ORDER BY ${primaryKey.columnName} ASC
+#end
+    </select>
+    
+    <!-- 分页查询${tableComment}列表 -->
+    <select id="findListWithPagination" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM ${tableName}
+        <where>
+#foreach($column in $columns)
+#if($column.javaType == "String")
+            <if test="${className.substring(0,1).toLowerCase()}${className.substring(1)}.${column.propertyName} != null and ${className.substring(0,1).toLowerCase()}${className.substring(1)}.${column.propertyName} != ''">
+                AND ${column.columnName} LIKE CONCAT('%', #{${className.substring(0,1).toLowerCase()}${className.substring(1)}.${column.propertyName}}, '%')
+            </if>
+#elseif(!$column.isPrimaryKey && $column.columnName != "create_time" && $column.columnName != "update_time")
+            <if test="${className.substring(0,1).toLowerCase()}${className.substring(1)}.${column.propertyName} != null">
+                AND ${column.columnName} = #{${className.substring(0,1).toLowerCase()}${className.substring(1)}.${column.propertyName}}
+            </if>
+#end
+#end
+        </where>
+#set($hasOrderField = false)
+#foreach($column in $columns)
+#if($column.columnName == "sort_order")
+#set($hasOrderField = true)
+        ORDER BY sort_order ASC
+#break
+#end
+#end
+#if(!$hasOrderField)
+        ORDER BY ${primaryKey.columnName} ASC
+#end
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 插入${tableComment} -->
+    <insert id="insert" parameterType="${modelPackageName}.${className}" useGeneratedKeys="true" keyProperty="${primaryKey.propertyName}">
+        INSERT INTO ${tableName} (
+#set($insertColumns = "")
+#foreach($column in $columns)
+#if($column.columnName != $primaryKey.columnName)
+#if($insertColumns != "")
+#set($insertColumns = $insertColumns + ", ")
+#end
+#set($insertColumns = $insertColumns + $column.columnName)
+#end
+#end
+            ${insertColumns}
+        ) VALUES (
+#set($insertValues = "")
+#foreach($column in $columns)
+#if($column.columnName != $primaryKey.columnName)
+#if($insertValues != "")
+#set($insertValues = $insertValues + ", ")
+#end
+#if($column.columnName == "create_time" || $column.columnName == "update_time")
+#set($insertValues = $insertValues + "NOW()")
+#else
+#set($insertValues = $insertValues + "#{" + $column.propertyName + "}")
+#end
+#end
+#end
+            ${insertValues}
+        )
+    </insert>
+    
+    <!-- 更新${tableComment} -->
+    <update id="update" parameterType="${modelPackageName}.${className}">
+        UPDATE ${tableName}
+        <set>
+#foreach($column in $columns)
+#if(!$column.isPrimaryKey && $column.columnName != "create_time")
+#if($column.columnName == "update_time")
+            update_time = NOW()#if($foreach.hasNext),#end
+
+#else
+            <if test="${column.propertyName} != null">${column.columnName} = #{${column.propertyName}}#if($foreach.hasNext),#end</if>
+#end
+#end
+#end
+        </set>
+        WHERE ${primaryKey.columnName} = #{${primaryKey.propertyName}}
+    </update>
+    
+#foreach($column in $columns)
+#if($column.columnName == "status")
+    <!-- 更新${tableComment}状态 -->
+    <update id="updateStatus">
+        UPDATE ${tableName}
+        SET status = #{status}, update_time = NOW()
+        WHERE ${primaryKey.columnName} = #{id}
+    </update>
+    
+#break
+#end
+#end
+    <!-- 删除${tableComment} -->
+    <delete id="deleteById">
+        DELETE FROM ${tableName}
+        WHERE ${primaryKey.columnName} = #{id}
+    </delete>
+    
+    <!-- 批量删除${tableComment} -->
+    <delete id="batchDelete">
+        DELETE FROM ${tableName}
+        WHERE ${primaryKey.columnName} IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

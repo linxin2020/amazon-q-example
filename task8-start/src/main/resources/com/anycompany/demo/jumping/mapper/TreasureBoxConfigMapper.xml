@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.anycompany.demo.jumping.mapper.TreasureBoxConfigMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.anycompany.demo.jumping.model.TreasureBoxConfig">
+        <id column="id" property="id" />
+        <result column="activity_id" property="activityId" />
+        <result column="box_level" property="boxLevel" />
+        <result column="box_name" property="boxName" />
+        <result column="required_points" property="requiredPoints" />
+        <result column="reward_type" property="rewardType" />
+        <result column="reward_content" property="rewardContent" />
+        <result column="reward_desc" property="rewardDesc" />
+        <result column="box_icon_url" property="boxIconUrl" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- 公共列 -->
+    <sql id="Base_Column_List">
+        id, activity_id, box_level, box_name, required_points, reward_type, reward_content, reward_desc, box_icon_url, create_time, update_time
+    </sql>
+    
+    <!-- 根据ID查询宝箱配置表 -->
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_treasure_box_config
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 根据活动ID查询宝箱配置表 -->
+    <select id="getByActivityId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_treasure_box_config
+        WHERE activity_id = #{activityId}
+        LIMIT 1
+    </select>
+    
+    <!-- 根据宝箱等级查询宝箱配置表 -->
+    <select id="getByBoxLevel" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_treasure_box_config
+        WHERE box_level = #{boxLevel}
+        LIMIT 1
+    </select>
+    
+    <!-- 查询所有宝箱配置表 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_treasure_box_config
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 条件查询宝箱配置表列表 -->
+    <select id="findList" parameterType="com.anycompany.demo.jumping.model.TreasureBoxConfig" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_treasure_box_config
+        <where>
+            <if test="activityId != null">
+                AND activity_id = #{activityId}
+            </if>
+            <if test="boxLevel != null and boxLevel != ''">
+                AND box_level LIKE CONCAT('%', #{boxLevel}, '%')
+            </if>
+            <if test="boxName != null and boxName != ''">
+                AND box_name LIKE CONCAT('%', #{boxName}, '%')
+            </if>
+            <if test="requiredPoints != null">
+                AND required_points = #{requiredPoints}
+            </if>
+            <if test="rewardType != null and rewardType != ''">
+                AND reward_type LIKE CONCAT('%', #{rewardType}, '%')
+            </if>
+            <if test="rewardContent != null and rewardContent != ''">
+                AND reward_content LIKE CONCAT('%', #{rewardContent}, '%')
+            </if>
+            <if test="rewardDesc != null and rewardDesc != ''">
+                AND reward_desc LIKE CONCAT('%', #{rewardDesc}, '%')
+            </if>
+            <if test="boxIconUrl != null and boxIconUrl != ''">
+                AND box_icon_url LIKE CONCAT('%', #{boxIconUrl}, '%')
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 分页查询宝箱配置表列表 -->
+    <select id="findListWithPagination" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_treasure_box_config
+        <where>
+            <if test="treasureBoxConfig.activityId != null">
+                AND activity_id = #{treasureBoxConfig.activityId}
+            </if>
+            <if test="treasureBoxConfig.boxLevel != null and treasureBoxConfig.boxLevel != ''">
+                AND box_level LIKE CONCAT('%', #{treasureBoxConfig.boxLevel}, '%')
+            </if>
+            <if test="treasureBoxConfig.boxName != null and treasureBoxConfig.boxName != ''">
+                AND box_name LIKE CONCAT('%', #{treasureBoxConfig.boxName}, '%')
+            </if>
+            <if test="treasureBoxConfig.requiredPoints != null">
+                AND required_points = #{treasureBoxConfig.requiredPoints}
+            </if>
+            <if test="treasureBoxConfig.rewardType != null and treasureBoxConfig.rewardType != ''">
+                AND reward_type LIKE CONCAT('%', #{treasureBoxConfig.rewardType}, '%')
+            </if>
+            <if test="treasureBoxConfig.rewardContent != null and treasureBoxConfig.rewardContent != ''">
+                AND reward_content LIKE CONCAT('%', #{treasureBoxConfig.rewardContent}, '%')
+            </if>
+            <if test="treasureBoxConfig.rewardDesc != null and treasureBoxConfig.rewardDesc != ''">
+                AND reward_desc LIKE CONCAT('%', #{treasureBoxConfig.rewardDesc}, '%')
+            </if>
+            <if test="treasureBoxConfig.boxIconUrl != null and treasureBoxConfig.boxIconUrl != ''">
+                AND box_icon_url LIKE CONCAT('%', #{treasureBoxConfig.boxIconUrl}, '%')
+            </if>
+        </where>
+        ORDER BY id ASC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 插入宝箱配置表 -->
+    <insert id="insert" parameterType="com.anycompany.demo.jumping.model.TreasureBoxConfig" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO demo_treasure_box_config (
+            activity_id, box_level, box_name, required_points, reward_type, reward_content, reward_desc, box_icon_url, create_time, update_time
+        ) VALUES (
+            #{activityId}, #{boxLevel}, #{boxName}, #{requiredPoints}, #{rewardType}, #{rewardContent}, #{rewardDesc}, #{boxIconUrl}, NOW(), NOW()
+        )
+    </insert>
+    
+    <!-- 更新宝箱配置表 -->
+    <update id="update" parameterType="com.anycompany.demo.jumping.model.TreasureBoxConfig">
+        UPDATE demo_treasure_box_config
+        <set>
+            <if test="activityId != null">activity_id = #{activityId},</if>
+            <if test="boxLevel != null">box_level = #{boxLevel},</if>
+            <if test="boxName != null">box_name = #{boxName},</if>
+            <if test="requiredPoints != null">required_points = #{requiredPoints},</if>
+            <if test="rewardType != null">reward_type = #{rewardType},</if>
+            <if test="rewardContent != null">reward_content = #{rewardContent},</if>
+            <if test="rewardDesc != null">reward_desc = #{rewardDesc},</if>
+            <if test="boxIconUrl != null">box_icon_url = #{boxIconUrl},</if>
+            update_time = NOW()
+
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除宝箱配置表 -->
+    <delete id="deleteById">
+        DELETE FROM demo_treasure_box_config
+        WHERE id = #{id}
+    </delete>
+    
+    <!-- 批量删除宝箱配置表 -->
+    <delete id="batchDelete">
+        DELETE FROM demo_treasure_box_config
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

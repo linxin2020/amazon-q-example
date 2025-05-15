@@ -1,0 +1,63 @@
+package ${packageName};
+
+import java.io.Serializable;
+#set($hasDate = false)
+#set($hasBigDecimal = false)
+#foreach($column in $columns)
+#if($column.javaType == "Date")
+#set($hasDate = true)
+#elseif($column.javaType == "BigDecimal")
+#set($hasBigDecimal = true)
+#end
+#end
+#if($hasDate)
+import java.util.Date;
+#end
+#if($hasBigDecimal)
+import java.math.BigDecimal;
+#end
+
+/**
+ * ${tableName.substring(5)}实体类
+ */
+public class ${className} implements Serializable {
+    
+    private static final long serialVersionUID = ${serialVersionUID};
+
+#foreach($column in $columns)
+    /**
+     * $!column.comment
+     */
+#if($column.isPrimaryKey)
+    private ${column.javaType} ${column.propertyName};
+#else
+    private ${column.javaType} ${column.propertyName};
+#end
+    
+#end
+    // Getters and Setters
+#foreach($column in $columns)
+    public ${column.javaType} get${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}() {
+        return ${column.propertyName};
+    }
+
+    public void set${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(${column.javaType} ${column.propertyName}) {
+        this.${column.propertyName} = ${column.propertyName};
+    }
+
+#end
+    @Override
+    public String toString() {
+        return "${className}{" +
+#set($first = true)
+#foreach($column in $columns)
+#if($first)
+                "${column.propertyName}=" + ${column.propertyName} +
+#set($first = false)
+#else
+                ", ${column.propertyName}=" + ${column.propertyName} +
+#end
+#end
+                '}';
+    }
+} 

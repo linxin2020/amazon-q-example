@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.anycompany.demo.jumping.mapper.ActivityConfigMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.anycompany.demo.jumping.model.ActivityConfig">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="start_time" property="startTime" />
+        <result column="end_time" property="endTime" />
+        <result column="total_cells" property="totalCells" />
+        <result column="daily_game_limit" property="dailyGameLimit" />
+        <result column="max_dice_per_time" property="maxDicePerTime" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- 公共列 -->
+    <sql id="Base_Column_List">
+        id, name, start_time, end_time, total_cells, daily_game_limit, max_dice_per_time, status, create_time, update_time
+    </sql>
+    
+    <!-- 根据ID查询活动配置表 -->
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_activity_config
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 根据活动名称查询活动配置表列表 -->
+    <select id="findByName" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_activity_config
+        WHERE name = #{name}
+    </select>
+    
+    <!-- 根据活动状态(0:未开始 1:进行中 2:已结束)查询活动配置表列表 -->
+    <select id="findByStatus" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_activity_config
+        WHERE status = #{status}
+    </select>
+    
+    <!-- 查询所有活动配置表 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_activity_config
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 查询所有启用的活动配置表 -->
+    <select id="findAllEnabled" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_activity_config
+        WHERE status = 1
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 条件查询活动配置表列表 -->
+    <select id="findList" parameterType="com.anycompany.demo.jumping.model.ActivityConfig" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_activity_config
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="startTime != null">
+                AND start_time = #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND end_time = #{endTime}
+            </if>
+            <if test="totalCells != null">
+                AND total_cells = #{totalCells}
+            </if>
+            <if test="dailyGameLimit != null">
+                AND daily_game_limit = #{dailyGameLimit}
+            </if>
+            <if test="maxDicePerTime != null">
+                AND max_dice_per_time = #{maxDicePerTime}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 分页查询活动配置表列表 -->
+    <select id="findListWithPagination" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_activity_config
+        <where>
+            <if test="activityConfig.name != null and activityConfig.name != ''">
+                AND name LIKE CONCAT('%', #{activityConfig.name}, '%')
+            </if>
+            <if test="activityConfig.startTime != null">
+                AND start_time = #{activityConfig.startTime}
+            </if>
+            <if test="activityConfig.endTime != null">
+                AND end_time = #{activityConfig.endTime}
+            </if>
+            <if test="activityConfig.totalCells != null">
+                AND total_cells = #{activityConfig.totalCells}
+            </if>
+            <if test="activityConfig.dailyGameLimit != null">
+                AND daily_game_limit = #{activityConfig.dailyGameLimit}
+            </if>
+            <if test="activityConfig.maxDicePerTime != null">
+                AND max_dice_per_time = #{activityConfig.maxDicePerTime}
+            </if>
+            <if test="activityConfig.status != null">
+                AND status = #{activityConfig.status}
+            </if>
+        </where>
+        ORDER BY id ASC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 插入活动配置表 -->
+    <insert id="insert" parameterType="com.anycompany.demo.jumping.model.ActivityConfig" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO demo_activity_config (
+            name, start_time, end_time, total_cells, daily_game_limit, max_dice_per_time, status, create_time, update_time
+        ) VALUES (
+            #{name}, #{startTime}, #{endTime}, #{totalCells}, #{dailyGameLimit}, #{maxDicePerTime}, #{status}, NOW(), NOW()
+        )
+    </insert>
+    
+    <!-- 更新活动配置表 -->
+    <update id="update" parameterType="com.anycompany.demo.jumping.model.ActivityConfig">
+        UPDATE demo_activity_config
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="startTime != null">start_time = #{startTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="totalCells != null">total_cells = #{totalCells},</if>
+            <if test="dailyGameLimit != null">daily_game_limit = #{dailyGameLimit},</if>
+            <if test="maxDicePerTime != null">max_dice_per_time = #{maxDicePerTime},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 更新活动配置表状态 -->
+    <update id="updateStatus">
+        UPDATE demo_activity_config
+        SET status = #{status}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除活动配置表 -->
+    <delete id="deleteById">
+        DELETE FROM demo_activity_config
+        WHERE id = #{id}
+    </delete>
+    
+    <!-- 批量删除活动配置表 -->
+    <delete id="batchDelete">
+        DELETE FROM demo_activity_config
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

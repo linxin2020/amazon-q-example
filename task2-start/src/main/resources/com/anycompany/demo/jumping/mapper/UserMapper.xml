@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.anycompany.demo.jumping.mapper.UserMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.anycompany.demo.jumping.model.User">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="nickname" property="nickname" />
+        <result column="email" property="email" />
+        <result column="phone" property="phone" />
+        <result column="avatar_url" property="avatarUrl" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- 公共列 -->
+    <sql id="Base_Column_List">
+        id, username, password, nickname, email, phone, avatar_url, create_time, update_time
+    </sql>
+    
+    <!-- 根据ID查询用户表 -->
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 根据用户名查询用户表 -->
+    <select id="getByUsername" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user
+        WHERE username = #{username}
+        LIMIT 1
+    </select>
+    
+    <!-- 根据邮箱查询用户表 -->
+    <select id="getByEmail" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user
+        WHERE email = #{email}
+        LIMIT 1
+    </select>
+    
+    <!-- 查询所有用户表 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 条件查询用户表列表 -->
+    <select id="findList" parameterType="com.anycompany.demo.jumping.model.User" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user
+        <where>
+            <if test="username != null and username != ''">
+                AND username LIKE CONCAT('%', #{username}, '%')
+            </if>
+            <if test="password != null and password != ''">
+                AND password LIKE CONCAT('%', #{password}, '%')
+            </if>
+            <if test="nickname != null and nickname != ''">
+                AND nickname LIKE CONCAT('%', #{nickname}, '%')
+            </if>
+            <if test="email != null and email != ''">
+                AND email LIKE CONCAT('%', #{email}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+            <if test="avatarUrl != null and avatarUrl != ''">
+                AND avatar_url LIKE CONCAT('%', #{avatarUrl}, '%')
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 分页查询用户表列表 -->
+    <select id="findListWithPagination" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user
+        <where>
+            <if test="user.username != null and user.username != ''">
+                AND username LIKE CONCAT('%', #{user.username}, '%')
+            </if>
+            <if test="user.password != null and user.password != ''">
+                AND password LIKE CONCAT('%', #{user.password}, '%')
+            </if>
+            <if test="user.nickname != null and user.nickname != ''">
+                AND nickname LIKE CONCAT('%', #{user.nickname}, '%')
+            </if>
+            <if test="user.email != null and user.email != ''">
+                AND email LIKE CONCAT('%', #{user.email}, '%')
+            </if>
+            <if test="user.phone != null and user.phone != ''">
+                AND phone LIKE CONCAT('%', #{user.phone}, '%')
+            </if>
+            <if test="user.avatarUrl != null and user.avatarUrl != ''">
+                AND avatar_url LIKE CONCAT('%', #{user.avatarUrl}, '%')
+            </if>
+        </where>
+        ORDER BY id ASC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 插入用户表 -->
+    <insert id="insert" parameterType="com.anycompany.demo.jumping.model.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO demo_user (
+            username, password, nickname, email, phone, avatar_url, create_time, update_time
+        ) VALUES (
+            #{username}, #{password}, #{nickname}, #{email}, #{phone}, #{avatarUrl}, NOW(), NOW()
+        )
+    </insert>
+    
+    <!-- 更新用户表 -->
+    <update id="update" parameterType="com.anycompany.demo.jumping.model.User">
+        UPDATE demo_user
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="avatarUrl != null">avatar_url = #{avatarUrl},</if>
+            update_time = NOW()
+
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除用户表 -->
+    <delete id="deleteById">
+        DELETE FROM demo_user
+        WHERE id = #{id}
+    </delete>
+    
+    <!-- 批量删除用户表 -->
+    <delete id="batchDelete">
+        DELETE FROM demo_user
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

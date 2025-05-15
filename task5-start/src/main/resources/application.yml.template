@@ -1,0 +1,53 @@
+server:
+  port: 8088
+  servlet:
+    context-path: /jumping-game
+
+spring:
+  application:
+    name: Jumping Game
+  
+  # 数据库配置
+  datasource:
+    url: #jdbc-url
+    username: #username
+    password: #password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 600000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+  
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath:com/anycompany/demo/jumping/mapper/*.xml
+  type-aliases-package: com.anycompany.demo.jumping.model
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    lazy-loading-enabled: true
+    aggressive-lazy-loading: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置
+logging:
+  level:
+    root: info
+    com.anycompany.demo.jumping: debug
+  file:
+    name: logs/jumping-game.log 
+
+# Redis配置
+redis:
+  host: #redis-endpoint
+  port: #redis-port
+  database: 0
+  timeout: 10000
+  
+# AWS SQS配置
+aws:
+  sqs:
+    endpoint: #sqs-endpoint
+    region: us-east-1

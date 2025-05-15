@@ -1,0 +1,115 @@
+package ${packageName};
+
+import ${modelPackageName}.${className};
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+/**
+ * ${tableComment}数据访问接口
+ */
+@Mapper
+public interface ${mapperName} {
+    
+    /**
+     * 根据ID查询${tableComment}
+     * @param id ID
+     * @return ${tableComment}信息
+     */
+    ${className} getById(@Param("id") ${primaryKey.javaType} id);
+    
+#foreach($column in $columns)
+#if($column.needGetBy)
+    /**
+     * 根据${column.columnComment}查询${tableComment}
+     * @param ${column.propertyName} ${column.columnComment}
+     * @return ${tableComment}信息
+     */
+    ${className} getBy${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(@Param("${column.propertyName}") ${column.javaType} ${column.propertyName});
+    
+#end
+#end
+#foreach($column in $columns)
+#if($column.needFindBy)
+    /**
+     * 根据${column.columnComment}查询${tableComment}列表
+     * @param ${column.propertyName} ${column.columnComment}
+     * @return ${tableComment}列表
+     */
+    List<${className}> findBy${column.propertyName.substring(0,1).toUpperCase()}${column.propertyName.substring(1)}(@Param("${column.propertyName}") ${column.javaType} ${column.propertyName});
+    
+#end
+#end
+    /**
+     * 查询所有${tableComment}
+     * @return ${tableComment}列表
+     */
+    List<${className}> findAll();
+    
+#foreach($column in $columns)
+#if($column.columnName == "status")
+    /**
+     * 查询所有启用的${tableComment}
+     * @return ${tableComment}列表
+     */
+    List<${className}> findAllEnabled();
+    
+#end
+#end
+    /**
+     * 查询${tableComment}列表
+     * @param ${className.substring(0,1).toLowerCase()}${className.substring(1)} 查询条件
+     * @return ${tableComment}列表
+     */
+    List<${className}> findList(${className} ${className.substring(0,1).toLowerCase()}${className.substring(1)});
+    
+    /**
+     * 分页查询${tableComment}列表
+     * @param ${className.substring(0,1).toLowerCase()}${className.substring(1)} 查询条件
+     * @param offset 偏移量
+     * @param limit 限制条数
+     * @return ${tableComment}列表
+     */
+    List<${className}> findListWithPagination(@Param("${className.substring(0,1).toLowerCase()}${className.substring(1)}") ${className} ${className.substring(0,1).toLowerCase()}${className.substring(1)}, @Param("offset") int offset, @Param("limit") int limit);
+    
+    /**
+     * 插入${tableComment}
+     * @param ${className.substring(0,1).toLowerCase()}${className.substring(1)} ${tableComment}信息
+     * @return 影响行数
+     */
+    int insert(${className} ${className.substring(0,1).toLowerCase()}${className.substring(1)});
+    
+    /**
+     * 更新${tableComment}
+     * @param ${className.substring(0,1).toLowerCase()}${className.substring(1)} ${tableComment}信息
+     * @return 影响行数
+     */
+    int update(${className} ${className.substring(0,1).toLowerCase()}${className.substring(1)});
+    
+#foreach($column in $columns)
+#if($column.columnName == "status")
+    /**
+     * 更新${tableComment}状态
+     * @param id ID
+     * @param status 状态值
+     * @return 影响行数
+     */
+    int updateStatus(@Param("id") ${primaryKey.javaType} id, @Param("status") ${column.javaType} status);
+    
+#end
+#end
+    /**
+     * 删除${tableComment}
+     * @param id ID
+     * @return 影响行数
+     */
+    int deleteById(@Param("id") ${primaryKey.javaType} id);
+    
+    /**
+     * 批量删除${tableComment}
+     * @param ids ID数组
+     * @return 影响行数
+     */
+    int batchDelete(@Param("ids") ${primaryKey.javaType}[] ids);
+}

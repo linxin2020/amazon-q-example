@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.anycompany.demo.jumping.mapper.UserGiftRecordMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.anycompany.demo.jumping.model.UserGiftRecord">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="activity_id" property="activityId" />
+        <result column="cell_id" property="cellId" />
+        <result column="gift_id" property="giftId" />
+        <result column="gift_type" property="giftType" />
+        <result column="gift_amount" property="giftAmount" />
+        <result column="receive_time" property="receiveTime" />
+        <result column="status" property="status" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- 公共列 -->
+    <sql id="Base_Column_List">
+        id, user_id, activity_id, cell_id, gift_id, gift_type, gift_amount, receive_time, status, create_time, update_time
+    </sql>
+    
+    <!-- 根据ID查询用户礼物道具记录表 -->
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_gift_record
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 根据用户ID查询用户礼物道具记录表 -->
+    <select id="getByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_gift_record
+        WHERE user_id = #{userId}
+        LIMIT 1
+    </select>
+    
+    <!-- 根据活动ID查询用户礼物道具记录表 -->
+    <select id="getByActivityId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_gift_record
+        WHERE activity_id = #{activityId}
+        LIMIT 1
+    </select>
+    
+    <!-- 根据格子ID查询用户礼物道具记录表 -->
+    <select id="getByCellId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_gift_record
+        WHERE cell_id = #{cellId}
+        LIMIT 1
+    </select>
+    
+    <!-- 根据状态(0:待发放 1:已发放)查询用户礼物道具记录表列表 -->
+    <select id="findByStatus" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_gift_record
+        WHERE status = #{status}
+    </select>
+    
+    <!-- 查询所有用户礼物道具记录表 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_gift_record
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 查询所有启用的用户礼物道具记录表 -->
+    <select id="findAllEnabled" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_gift_record
+        WHERE status = 1
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 条件查询用户礼物道具记录表列表 -->
+    <select id="findList" parameterType="com.anycompany.demo.jumping.model.UserGiftRecord" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_gift_record
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="activityId != null">
+                AND activity_id = #{activityId}
+            </if>
+            <if test="cellId != null">
+                AND cell_id = #{cellId}
+            </if>
+            <if test="giftId != null and giftId != ''">
+                AND gift_id LIKE CONCAT('%', #{giftId}, '%')
+            </if>
+            <if test="giftType != null and giftType != ''">
+                AND gift_type LIKE CONCAT('%', #{giftType}, '%')
+            </if>
+            <if test="giftAmount != null">
+                AND gift_amount = #{giftAmount}
+            </if>
+            <if test="receiveTime != null">
+                AND receive_time = #{receiveTime}
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 分页查询用户礼物道具记录表列表 -->
+    <select id="findListWithPagination" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_gift_record
+        <where>
+            <if test="userGiftRecord.userId != null">
+                AND user_id = #{userGiftRecord.userId}
+            </if>
+            <if test="userGiftRecord.activityId != null">
+                AND activity_id = #{userGiftRecord.activityId}
+            </if>
+            <if test="userGiftRecord.cellId != null">
+                AND cell_id = #{userGiftRecord.cellId}
+            </if>
+            <if test="userGiftRecord.giftId != null and userGiftRecord.giftId != ''">
+                AND gift_id LIKE CONCAT('%', #{userGiftRecord.giftId}, '%')
+            </if>
+            <if test="userGiftRecord.giftType != null and userGiftRecord.giftType != ''">
+                AND gift_type LIKE CONCAT('%', #{userGiftRecord.giftType}, '%')
+            </if>
+            <if test="userGiftRecord.giftAmount != null">
+                AND gift_amount = #{userGiftRecord.giftAmount}
+            </if>
+            <if test="userGiftRecord.receiveTime != null">
+                AND receive_time = #{userGiftRecord.receiveTime}
+            </if>
+            <if test="userGiftRecord.status != null">
+                AND status = #{userGiftRecord.status}
+            </if>
+        </where>
+        ORDER BY id ASC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 插入用户礼物道具记录表 -->
+    <insert id="insert" parameterType="com.anycompany.demo.jumping.model.UserGiftRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO demo_user_gift_record (
+            user_id, activity_id, cell_id, gift_id, gift_type, gift_amount, receive_time, status, create_time, update_time
+        ) VALUES (
+            #{userId}, #{activityId}, #{cellId}, #{giftId}, #{giftType}, #{giftAmount}, #{receiveTime}, #{status}, NOW(), NOW()
+        )
+    </insert>
+    
+    <!-- 更新用户礼物道具记录表 -->
+    <update id="update" parameterType="com.anycompany.demo.jumping.model.UserGiftRecord">
+        UPDATE demo_user_gift_record
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="activityId != null">activity_id = #{activityId},</if>
+            <if test="cellId != null">cell_id = #{cellId},</if>
+            <if test="giftId != null">gift_id = #{giftId},</if>
+            <if test="giftType != null">gift_type = #{giftType},</if>
+            <if test="giftAmount != null">gift_amount = #{giftAmount},</if>
+            <if test="receiveTime != null">receive_time = #{receiveTime},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 更新用户礼物道具记录表状态 -->
+    <update id="updateStatus">
+        UPDATE demo_user_gift_record
+        SET status = #{status}, update_time = NOW()
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除用户礼物道具记录表 -->
+    <delete id="deleteById">
+        DELETE FROM demo_user_gift_record
+        WHERE id = #{id}
+    </delete>
+    
+    <!-- 批量删除用户礼物道具记录表 -->
+    <delete id="batchDelete">
+        DELETE FROM demo_user_gift_record
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

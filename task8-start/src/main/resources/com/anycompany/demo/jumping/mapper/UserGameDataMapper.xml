@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.anycompany.demo.jumping.mapper.UserGameDataMapper">
+    
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.anycompany.demo.jumping.model.UserGameData">
+        <id column="id" property="id" />
+        <result column="user_id" property="userId" />
+        <result column="activity_id" property="activityId" />
+        <result column="current_position" property="currentPosition" />
+        <result column="remaining_chances" property="remainingChances" />
+        <result column="daily_used_chances" property="dailyUsedChances" />
+        <result column="total_points" property="totalPoints" />
+        <result column="last_game_time" property="lastGameTime" />
+        <result column="is_new_user" property="isNewUser" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+    <!-- 公共列 -->
+    <sql id="Base_Column_List">
+        id, user_id, activity_id, current_position, remaining_chances, daily_used_chances, total_points, last_game_time, is_new_user, create_time, update_time
+    </sql>
+    
+    <!-- 根据ID查询用户游戏数据表 -->
+    <select id="getById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_game_data
+        WHERE id = #{id}
+    </select>
+    
+    <!-- 根据用户ID查询用户游戏数据表 -->
+    <select id="getByUserId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_game_data
+        WHERE user_id = #{userId}
+        LIMIT 1
+    </select>
+    
+    <!-- 根据活动ID查询用户游戏数据表 -->
+    <select id="getByActivityId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_game_data
+        WHERE activity_id = #{activityId}
+        LIMIT 1
+    </select>
+    
+    <!-- 查询所有用户游戏数据表 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_game_data
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 条件查询用户游戏数据表列表 -->
+    <select id="findList" parameterType="com.anycompany.demo.jumping.model.UserGameData" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_game_data
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="activityId != null">
+                AND activity_id = #{activityId}
+            </if>
+            <if test="currentPosition != null">
+                AND current_position = #{currentPosition}
+            </if>
+            <if test="remainingChances != null">
+                AND remaining_chances = #{remainingChances}
+            </if>
+            <if test="dailyUsedChances != null">
+                AND daily_used_chances = #{dailyUsedChances}
+            </if>
+            <if test="totalPoints != null">
+                AND total_points = #{totalPoints}
+            </if>
+            <if test="lastGameTime != null">
+                AND last_game_time = #{lastGameTime}
+            </if>
+            <if test="isNewUser != null">
+                AND is_new_user = #{isNewUser}
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+    
+    <!-- 分页查询用户游戏数据表列表 -->
+    <select id="findListWithPagination" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM demo_user_game_data
+        <where>
+            <if test="userGameData.userId != null">
+                AND user_id = #{userGameData.userId}
+            </if>
+            <if test="userGameData.activityId != null">
+                AND activity_id = #{userGameData.activityId}
+            </if>
+            <if test="userGameData.currentPosition != null">
+                AND current_position = #{userGameData.currentPosition}
+            </if>
+            <if test="userGameData.remainingChances != null">
+                AND remaining_chances = #{userGameData.remainingChances}
+            </if>
+            <if test="userGameData.dailyUsedChances != null">
+                AND daily_used_chances = #{userGameData.dailyUsedChances}
+            </if>
+            <if test="userGameData.totalPoints != null">
+                AND total_points = #{userGameData.totalPoints}
+            </if>
+            <if test="userGameData.lastGameTime != null">
+                AND last_game_time = #{userGameData.lastGameTime}
+            </if>
+            <if test="userGameData.isNewUser != null">
+                AND is_new_user = #{userGameData.isNewUser}
+            </if>
+        </where>
+        ORDER BY id ASC
+        LIMIT #{offset}, #{limit}
+    </select>
+    
+    <!-- 插入用户游戏数据表 -->
+    <insert id="insert" parameterType="com.anycompany.demo.jumping.model.UserGameData" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO demo_user_game_data (
+            user_id, activity_id, current_position, remaining_chances, daily_used_chances, total_points, last_game_time, is_new_user, create_time, update_time
+        ) VALUES (
+            #{userId}, #{activityId}, #{currentPosition}, #{remainingChances}, #{dailyUsedChances}, #{totalPoints}, #{lastGameTime}, #{isNewUser}, NOW(), NOW()
+        )
+    </insert>
+    
+    <!-- 更新用户游戏数据表 -->
+    <update id="update" parameterType="com.anycompany.demo.jumping.model.UserGameData">
+        UPDATE demo_user_game_data
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="activityId != null">activity_id = #{activityId},</if>
+            <if test="currentPosition != null">current_position = #{currentPosition},</if>
+            <if test="remainingChances != null">remaining_chances = #{remainingChances},</if>
+            <if test="dailyUsedChances != null">daily_used_chances = #{dailyUsedChances},</if>
+            <if test="totalPoints != null">total_points = #{totalPoints},</if>
+            <if test="lastGameTime != null">last_game_time = #{lastGameTime},</if>
+            <if test="isNewUser != null">is_new_user = #{isNewUser},</if>
+            update_time = NOW()
+
+        </set>
+        WHERE id = #{id}
+    </update>
+    
+    <!-- 删除用户游戏数据表 -->
+    <delete id="deleteById">
+        DELETE FROM demo_user_game_data
+        WHERE id = #{id}
+    </delete>
+    
+    <!-- 批量删除用户游戏数据表 -->
+    <delete id="batchDelete">
+        DELETE FROM demo_user_game_data
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
